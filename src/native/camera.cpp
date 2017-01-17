@@ -174,8 +174,7 @@ void Open(const FunctionCallbackInfo<Value>& args) {
     
     //Default Arguments
     message->codec = std::string(".jpg");
-    Local<Value> input = Number::New(isolate,0);
-    std::string inputString;
+    int32_t inputNumber = 0;
     
     //Check if size is passed
     if(args.Length() == 2) {
@@ -197,10 +196,7 @@ void Open(const FunctionCallbackInfo<Value>& args) {
             message->codec = stringValue(val);
         }
         if(params->Has(String::NewFromUtf8(isolate,"input"))) {
-            Local<Value> input = params->Get(String::NewFromUtf8(isolate,"input"));
-            if(!input->IsNumber()) {
-                inputString = stringValue(input);
-            }
+            inputNumber = params->Get(String::NewFromUtf8(isolate,"input"))->Int32Value();
         }
         
     }
@@ -212,11 +208,7 @@ void Open(const FunctionCallbackInfo<Value>& args) {
     
     //Initiate OpenCV WebCam
     message->capture = new cv::VideoCapture();
-    if(input->IsNumber()) {
-        message->capture->open((int)input->Int32Value());
-    } else if(!inputString.empty()) {
-        message->capture->open(inputString);
-    }
+    message->capture->open(inputNumber);
     cv::waitKey(10);
     
     uv_work_t* req = new uv_work_t();
